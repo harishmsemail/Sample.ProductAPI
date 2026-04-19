@@ -32,7 +32,7 @@ A sample ASP.NET Core Web API for managing a product catalog. This project demon
 ### Setup and Running the Application
 
 1. **Clone the repository:**
-1. ```bash git clone <your-repository-url>
+```bash git clone <your-repository-url>```
 
 2. **Navigate to the project directory:**
 1. ```bash cd SampleProductApi
