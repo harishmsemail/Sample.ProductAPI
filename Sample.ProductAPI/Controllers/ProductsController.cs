@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Sample.ProductAPI.DataAccess;
-using Sample.ProductAPI.Models;
+using Sample.ProductAPI.Dtos;
 
 namespace Sample.ProductAPI.Controllers
 {
     /// <summary>
-    /// API controller for products.
+    /// API controller for managing products.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route(ApiRoutes.Products.Base)]
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
@@ -18,7 +18,7 @@ namespace Sample.ProductAPI.Controllers
         /// Initializes a new instance of the <see cref="ProductsController"/> class.
         /// </summary>
         /// <param name="productRepository">The product repository.</param>
-        /// <param name="logger">The logger.</param>
+        /// <param name="logger">The logger for this controller.</param>
         public ProductsController(IProductRepository productRepository, ILogger<ProductsController> logger)
         {
             _productRepository = productRepository;
@@ -26,64 +26,81 @@ namespace Sample.ProductAPI.Controllers
         }
 
         /// <summary>
-        /// Gets a single product by its ID.
-        /// API Path: GET /api/Products/{productId}
-        /// </summary>
-        /// <param name="productId">The product ID.</param>
-        /// <returns>The product.</returns>
-        [HttpGet("{productId}")]
-        [ProducesResponseType(typeof(Product), 200)]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> GetProduct(int productId)
-        {
-            _logger.LogInformation("Getting product with ID: {ProductId}", productId);
-            var product = await _productRepository.GetProductAsync(productId);
-
-            if (product == null)
-            {
-                _logger.LogWarning("Product with ID: {ProductId} not found.", productId);
-                return NotFound();
-            }
-
-            return Ok(product);
-        }
-
-        /// <summary>
-        /// Gets a list of all products, ordered by rating.
-        /// API Path: GET /api/Products
+        /// Retrieves all products.
         /// </summary>
         /// <returns>A list of products.</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Product>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProducts()
         {
-            _logger.LogInformation("Getting all products.");
-            var products = await _productRepository.GetProductsAsync();
-            return Ok(products);
+            _logger.LogInformation("Attempting to retrieve all products.");
+            try
+            {
+                var products = await _productRepository.GetProductsAsync();
+                _logger.LogInformation("Successfully retrieved {ProductCount} products.", products.Count());
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while retrieving all products.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
         }
 
         /// <summary>
-        /// Gets attributes for a specific product.
-        /// API Path: GET /api/Products/{productId}/attributes
+        /// Retrieves a specific product by its ID.
         /// </summary>
-        /// <param name="productId">The product ID.</param>
-        /// <returns>A list of product attributes.</returns>
-        [HttpGet("{productId}/attributes")]
-        [ProducesResponseType(typeof(IEnumerable<ProductAttribute>), 200)]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> GetProductAttributes(int productId)
+        /// <param name="id">The ID of the product to retrieve.</param>
+        /// <returns>The requested product.</returns>
+        [HttpGet(ApiRoutes.Products.GetById)]
+        [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetProduct(int id)
         {
-            _logger.LogInformation("Getting attributes for product with ID: {ProductId}", productId);
-            var attributes = await _productRepository.GetProductAttributesAsync(productId);
+            _logger.LogInformation("Attempting to retrieve product with ID: {ProductId}", id);
+            try
+            {
+                var product = await _productRepository.GetProductAsync(id);
+                if (product == null)
+                {
+                    _logger.LogWarning("Product with ID: {ProductId} was not found.", id);
+                    return NotFound();
+                }
 
-            if (!attributes.Any())
-            {                
-                // For this exercise, I will return 404 if no attributes are found. Need decision.
-                _logger.LogWarning("No attributes found for product with ID: {ProductId}", productId);
-                return NotFound();
+                _logger.LogInformation("Successfully retrieved product with ID: {ProductId}", id);
+                return Ok(product);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while retrieving product with ID: {ProductId}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
+        }
 
-            return Ok(attributes);
+        /// <summary>
+        /// Retrieves all attributes for a specific product.
+        /// </summary>
+        /// <param name="id">The ID of the product.</param>
+        /// <returns>A list of product attributes.</returns>
+        [HttpGet(ApiRoutes.Products.GetAttributes)]
+        [ProducesResponseType(typeof(IEnumerable<ProductAttributeDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetProductAttributes(int id)
+        {
+            _logger.LogInformation("Attempting to retrieve attributes for product with ID: {ProductId}", id);
+            try
+            {
+                var attributes = await _productRepository.GetProductAttributesAsync(id);
+                _logger.LogInformation("Successfully retrieved {AttributeCount} attributes for product with ID: {ProductId}", attributes.Count(), id);
+                return Ok(attributes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while retrieving attributes for product with ID: {ProductId}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
+            }
         }
     }
 }
