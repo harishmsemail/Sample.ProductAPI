@@ -70,6 +70,7 @@ Retrieves a single product by its unique identifier.
 - **Success Response:**
 - `200 OK` - Returns the product object.
 - **Error Responses:**
+- `400 Bad Request` - The `id` parameter is not a valid integer.
 - `404 Not Found` - The product with the specified ID does not exist.
 - `500 Internal Server Error` - An unexpected error occurred on the server.
 
@@ -84,6 +85,8 @@ Retrieves all attributes for a specific product.
 - **Success Response:**
   - `200 OK` - Returns an array of product attribute objects.
 - **Error Response:**
+  - `400 Bad Request` - The `id` parameter is not a valid integer.
+  - `404 Not Found` - The product with the specified ID does not exist.
   - `500 Internal Server Error` - An unexpected error occurred on the server.
 
 ---
