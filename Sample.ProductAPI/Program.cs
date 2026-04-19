@@ -32,6 +32,15 @@ builder.Services.AddProblemDetails();
 // --- Application Building ---
 var app = builder.Build();
 
+// --- Database Initialization ---
+// Ensure the database is created and seeded at startup.
+// This is especially important for in-memory databases.
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 // --- Middleware Pipeline Configuration ---
 
 // Configure the HTTP request pipeline.
@@ -56,15 +65,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// --- Application Startup & Seeding ---
+// --- Application Startup ---
 
 try
 {
     Log.Information("Starting up the application");
-
-    // Seed the database for demonstration purposes
-    DataSeeder.SeedData(app);
-
     app.Run();
 }
 catch (Exception ex)
