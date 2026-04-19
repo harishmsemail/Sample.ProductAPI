@@ -55,6 +55,7 @@ namespace Sample.ProductAPI.Controllers
         /// <returns>The requested product.</returns>
         [HttpGet(ApiRoutes.Products.GetById)]
         [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProduct(int id)
@@ -62,6 +63,7 @@ namespace Sample.ProductAPI.Controllers
             _logger.LogInformation("Attempting to retrieve product with ID: {ProductId}", id);
             try
             {
+                //First, check if the product exists
                 var product = await _productRepository.GetProductAsync(id);
                 if (product == null)
                 {
@@ -86,12 +88,22 @@ namespace Sample.ProductAPI.Controllers
         /// <returns>A list of product attributes.</returns>
         [HttpGet(ApiRoutes.Products.GetAttributes)]
         [ProducesResponseType(typeof(IEnumerable<ProductAttributeDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProductAttributes(int id)
         {
             _logger.LogInformation("Attempting to retrieve attributes for product with ID: {ProductId}", id);
             try
             {
+                //First, check if the product exists
+                var product = await _productRepository.GetProductAsync(id);
+                if (product == null)
+                {
+                    _logger.LogWarning("Product with ID: {ProductId} was not found when retrieving attributes.", id);
+                    return NotFound();
+                }
+                
                 var attributes = await _productRepository.GetProductAttributesAsync(id);
                 _logger.LogInformation("Successfully retrieved {AttributeCount} attributes for product with ID: {ProductId}", attributes.Count(), id);
                 return Ok(attributes);
