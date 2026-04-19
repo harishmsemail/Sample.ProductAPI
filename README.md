@@ -32,13 +32,17 @@ A sample ASP.NET Core Web API for managing a product catalog. This project demon
 ### Setup and Running the Application
 
 1. **Clone the repository:**
-```bash git clone <your-repository-url>```
-
+   ```bash
+git clone <your-repository-url>
+```
 2. **Navigate to the project directory:**
-1. ```bash cd SampleProductApi
-
+   ```bash
+cd SampleProductApi
+```
 3. **Run the application:**
-1. ```bash dotnet run	
+   ```bash
+dotnet run
+```
 
 The API will start and listen on the configured ports (e.g., `https://localhost:7123` and `http://localhost:5123`).
 
