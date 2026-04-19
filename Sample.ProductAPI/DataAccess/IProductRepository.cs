@@ -1,30 +1,31 @@
+using Sample.ProductAPI.Dtos;
 using Sample.ProductAPI.Models;
 
 namespace Sample.ProductAPI.DataAccess
 {
     /// <summary>
-    /// Defines the contract for a repository managing product data.
+    /// Defines the contract for a product repository.
     /// </summary>
     public interface IProductRepository
     {
         /// <summary>
-        /// Retrieves a single product by its id.
+        /// Retrieves a single product by its ID.
         /// </summary>
         /// <param name="productId">The ID of the product to retrieve.</param>
-        /// <returns>The <see cref="Product"/> if found; otherwise, <c>null</c>.</returns>
-        Task<Product?> GetProductAsync(int productId);
+        /// <returns>The product, or null if not found.</returns>
+        Task<ProductDto?> GetProductAsync(int productId);
 
         /// <summary>
-        /// Retrieves a list of all products, sorted descending by rating.
+        /// Retrieves all products.
         /// </summary>
-        /// <returns>An enumerable collection of products.</returns>
-        Task<IEnumerable<Product>> GetProductsAsync();
+        /// <returns>A collection of all products.</returns>
+        Task<IEnumerable<ProductDto>> GetProductsAsync();
 
         /// <summary>
-        /// Retrieves all attributes for a specific product id.
+        /// Retrieves all attributes for a given product.
         /// </summary>
-        /// <param name="productId">The ID of the product whose attributes are to be retrieved.</param>
-        /// <returns>An enumerable collection of product attributes.</returns>
-        Task<IEnumerable<ProductAttribute>> GetProductAttributesAsync(int productId);
+        /// <param name="productId">The ID of the product.</param>
+        /// <returns>A collection of product attributes.</returns>
+        Task<IEnumerable<ProductAttributeDto>> GetProductAttributesAsync(int productId);
     }
 }
