@@ -33,17 +33,16 @@ A sample ASP.NET Core Web API for managing a product catalog. This project demon
 
 1. **Clone the repository:**
    ```bash
-git clone <your-repository-url>
-```
+   git clone <your-repository-url>
+   ```
 2. **Navigate to the project directory:**
    ```bash
-cd SampleProductApi
-```
+   cd SampleProductApi
+   ```
 3. **Run the application:**
    ```bash
-dotnet run
-```
-
+   dotnet run
+   ```
 The API will start and listen on the configured ports (e.g., `https://localhost:7123` and `http://localhost:5123`).
 
 4. **Access the Swagger UI:**
